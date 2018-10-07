@@ -1,0 +1,78 @@
+##############################
+CUCUMBER logs
+##############################
+
+Using the default profile...
+Feature: search for movies by director
+   As a movie buff
+  So that I can find movies with my favorite director
+  I want to include and serach on director information in movies I enter
+
+  Background: movies in database      # features/directors.feature:5
+    Given the following movies exist: # features/step_definitions/movie_steps.rb:1
+      | title        | rating | director     | release_date |
+      | Star Wars    | PG     | George Lucas | 1977-05-25   |
+      | Blade Runner | PG     | Ridley Scott | 1982-06-25   |
+      | Alien        | R      |              | 1979-05-25   |
+      | THX-1138     | R      | George Lucas | 1971-03-11   |
+
+  Scenario: find movie with same director                       # features/directors.feature:13
+    Given I am on the details page for "Star Wars"              # features/step_definitions/web_steps.rb:44
+    When I follow "Find Movies With Same Director"              # features/step_definitions/web_steps.rb:56
+    Then I should be on the Similar Movies page for "Star Wars" # features/step_definitions/web_steps.rb:230
+    And I should see "THX-1138"                                 # features/step_definitions/web_steps.rb:105
+    But I should not see "Blade Runner"                         # features/step_definitions/web_steps.rb:123
+
+  Scenario: can't find similar movies if we don't know director (sad path)               # features/directors.feature:20
+    Given I am on the details page for "Alien"                                           # features/step_definitions/web_steps.rb:44
+    Then I should not see "Ridley Scott"                                                 # features/step_definitions/web_steps.rb:123
+    When I follow "Find Movies With Same Director"                                       # features/step_definitions/web_steps.rb:56
+    Then I should be on the home page                                                    # features/step_definitions/web_steps.rb:230
+    And I should see "There is no Director information associated to the movie 'Alien'." # features/step_definitions/web_steps.rb:105
+
+  Scenario: add director to existing movie                # features/directors.feature:27
+    When I go to the edit page for "Alien"                # features/step_definitions/web_steps.rb:48
+    And I fill in "Director" with "Ridley Scott"          # features/step_definitions/web_steps.rb:60
+    And I press "Update Movie Info"                       # features/step_definitions/web_steps.rb:52
+    Then the director of "Alien" should be "Ridley Scott" # features/step_definitions/movie_steps.rb:29
+
+  Scenario: delete movie                             # features/directors.feature:33
+    Given I am on the details page for "Star Wars"   # features/step_definitions/web_steps.rb:44
+    And I press "Delete"                             # features/step_definitions/web_steps.rb:52
+    Then I should be on the RottenPotatoes home page # features/step_definitions/web_steps.rb:230
+    And I should see "Movie 'Star Wars' deleted."    # features/step_definitions/web_steps.rb:105
+
+  Scenario: sort movies alphabetically                 # features/directors.feature:39
+    Given I am on the RottenPotatoes home page         # features/step_definitions/web_steps.rb:44
+    When I follow "Movie Title"                        # features/step_definitions/web_steps.rb:56
+    Then I should see "Blade Runner" before "THX-1138" # features/step_definitions/movie_steps.rb:24
+
+  Scenario: sort movies in increasing order of release date # features/directors.feature:44
+    Given I am on the RottenPotatoes home page              # features/step_definitions/web_steps.rb:44
+    When I follow "Release Date"                            # features/step_definitions/web_steps.rb:56
+    Then I should see "THX-1138" before "Alien"             # features/step_definitions/movie_steps.rb:24
+
+  Scenario: add movie                                            # features/directors.feature:49
+    Given I am on the RottenPotatoes home page                   # features/step_definitions/web_steps.rb:44
+    And I follow "Add new movie"                                 # features/step_definitions/web_steps.rb:56
+    Then I should be on the new movie page                       # features/step_definitions/web_steps.rb:230
+    When I fill in "Title" with "Ship of Theseus"                # features/step_definitions/web_steps.rb:60
+    And I select "R" from "Rating"                               # features/step_definitions/web_steps.rb:85
+    And I press "Save Changes"                                   # features/step_definitions/web_steps.rb:52
+    Then I should be on the RottenPotatoes home page             # features/step_definitions/web_steps.rb:230
+    And I should see "Ship of Theseus was successfully created." # features/step_definitions/web_steps.rb:105
+
+7 scenarios (7 passed)
+39 steps (39 passed)
+0m0.413s
+Coverage report generated for Cucumber Features, RSpec to /home/ec2-user/environment/hw-acceptance-unit-test-cycle/rottenpotatoes/coverage. 55 / 56 LOC (98.21%) covered.
+......
+
+###############################
+RSPEC results
+###############################
+
+Finished in 0.05876 seconds (files took 1.61 seconds to load)
+6 examples, 0 failures
+
+Coverage report generated for Cucumber Features, RSpec to /home/ec2-user/environment/hw-acceptance-unit-test-cycle/rottenpotatoes/coverage. 55 / 56 LOC (98.21%) covered.
